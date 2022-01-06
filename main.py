@@ -2,6 +2,7 @@ import streamlit as st
 import streamlit as st
 import pandas as pd
 from visualization import *
+import plotly.graph_objs as go
 
 def readData():
     Video_Games = pd.read_csv('vgsales.csv')
@@ -20,7 +21,7 @@ sidebar.title('User Options')
 
 
 def introduction():
-    st.image('gaming.png', use_column_width=True)
+    st.image('vg.gif', width=None)
     st.markdown("""
         ## Heading Level 2
         - Feature 1
@@ -36,7 +37,7 @@ def introduction():
 
 def execute():
     
-    st.image('image.png', use_column_width=True)
+    st.image('image.png')
     st.subheader('project working here')
     st.dataframe(df)
 
@@ -93,37 +94,30 @@ def execute():
     st.dataframe(data)
     fig = plotLine(data, 'Year', 'Publisher')
     st.plotly_chart(fig, use_container_width=True)
-    
 
+    # Most popular Genre
+    st.title('Most Popular Genre')
+    data1 = df.groupby('Genre', as_index=False).count()
+    fig= px.pie(data1, labels='Genre', values='Rank', names='Genre')
 
-    # top 10 plateforms
-
-    st.title('Top 10 Platforms Per Year')
-    selYear = st.selectbox("Select any one option", df[df['Year'] != 0].sort_values('Year').Year.unique())
-    data = df[df['Year'] == selYear ].groupby('Plateform', as_index=False).count().sort_values('Plateform').head(10)
-
-    fig = plotBar(data,'Plateform', 'Name')
-    st.plotly_chart(fig, use_container_width=True)
-    
-    
-    #sizes = [15, 30, 45, 10]
-    
-
-    st.title('Top 10 Genre in the US')
-    fig=plotPie(data,['NA_Sales', 'EU_Sales', 'JP_Sales','Other_Sales','Global_Sales'])
-
-    st.plotly_chart(fig, use_container_width=True)
-    
-    
-    # Top 10 Genre in North America
-    st.title('Top 10 Genre in the US')
-    top_us = df.sort_values('NA_Sales', ascending=False)
-    top_us_genre = top_us.Genre.value_counts()
-    fig = plotPie(data,top_us_genre)
+    data3 = df[df['Year']!=0].groupby('Year', as_index=False).sum()
     st.plotly_chart(fig, use_container_width=True)
 
-
     
+    
+    # Various Sales in years according to their Regions
+    
+    st.title('Sales in Various Regions')
+    data = df[df['Year'] != 0].groupby('Year', as_index=False).count()
+    px.line(data, 'Year', 'Name')
+
+    fig = go.Figure()
+    fig.add_trace(go.Line(x = data3.Year, y = data3.NA_Sales, name="NA Sales"))
+    fig.add_trace(go.Line(x = data3.Year, y = data3.EU_Sales, name="EU Sales"))
+    fig.add_trace(go.Line(x = data3.Year, y = data3.JP_Sales, name="JP Sales"))
+    fig.add_trace(go.Line(x = data3.Year, y = data3.Other_Sales, name="Other Sales"))
+    fig.add_trace(go.Line(x = data3.Year, y = data3.Global_Sales, name="Global Sales"))
+    st.plotly_chart(fig, use_container_width=True)
 
 options = ['Project Introduction', 'Execution']
 
