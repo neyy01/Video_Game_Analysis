@@ -89,8 +89,8 @@ def execute():
     # No. of games published per year
 
     st.title('No. of Games Published Per Year')
-    data = df.groupby('Year', as_index=False).count().sort_values('Year',ascending=True)[df['Year']!=0]
-    #st.dataframe(data)
+    data = df[df['Year'] != 0].groupby('Year', as_index=False).count()
+    st.dataframe(data)
     fig = plotLine(data, 'Year', 'Publisher')
     st.plotly_chart(fig, use_container_width=True)
     
@@ -99,10 +99,10 @@ def execute():
     # top 10 plateforms
 
     st.title('Top 10 Platforms Per Year')
-    top_10_plt = st.selectbox("Select any one option", ['NA_Sales', 'EU_Sales', 'JP_Sales','Other_Sales','Global_Sales'])
-    data = df.sort_values('NA_Sales').head(10)
+    selYear = st.selectbox("Select any one option", df[df['Year'] != 0].sort_values('Year').Year.unique())
+    data = df[df['Year'] == selYear ].groupby('Plateform', as_index=False).count().sort_values('Plateform').head(10)
 
-    fig = plotLine(data,'Plateform', top_10_plt)
+    fig = plotBar(data,'Plateform', 'Name')
     st.plotly_chart(fig, use_container_width=True)
     
     
